@@ -1,13 +1,15 @@
 import QtQuick 2.12
 import QtQuick.Window 2.12
-import QtQuick.Shapes 1.0 //as Shapes
+import QtQuick.Shapes 1.12 //as Shapes
 import QtGraphicalEffects 1.12 as GraphicFX
 import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.5
 import QtQuick.Controls.Material 2.12
 import Qt.labs.platform 1.1
+import QtQuick.Dialogs 1.2
 
 ApplicationWindow {
+    id: root
     visible: true
     color: Material.background
     width: 1200
@@ -17,8 +19,37 @@ ApplicationWindow {
     Material.theme: Material.Dark
     Material.accent: Material.Teal
 
+    DropArea {
+        id: dragArea
+        z: 100
+        anchors.fill: parent
+        onEntered: {
+            if( drag.hasUrls && drag.urls[0].toString().endsWith(".json")) {
+                drag.accept();
+            } else {
+                console.log("No compatible File (drop Json-Snapora-Logo-File)")
+            }
+        }
+
+        onDropped: {
+            if( drop.hasUrls && drop.urls[0].toString().endsWith(".json")) {
+                drop.accept();
+                root.loadJsonFile(drop.urls[0]);
+            } else {
+                console.log("Dropped File not accepted");
+            }
+        }
+    }
+
     Item {
         id: lp
+        property real sscale: 1
+        property color planetColor1: "#43e97b"
+        property color planetColor2: "#38f9d7"
+        property color sColor1: "#4facfe"
+        property color sColor2: "#00f2fe"
+        property color sideColor1: Qt.darker("#4facfe")
+        property color sideColor2: Qt.darker("#00f2fe")
         property real radius: 100
         property real sHeight: 70
         property real sWidth: 300
@@ -42,7 +73,7 @@ ApplicationWindow {
         property real cosSkew: Math.cos(lp.skew)
         property real controlLengthOuter: lp.radius * lp.outerLengthFactor
         property real controlLengthInner: lp.radius * lp.innerLengthFactor
-
+        //property real angle: a*Math.PI
     }
 
     Item {
@@ -122,11 +153,164 @@ ApplicationWindow {
             id: innerControls
             width: controls.width
             columns: 3
+            //*
+            RowLayout {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.columnSpan: 3
+                Button {
+                    Layout.minimumWidth: 80
+                    onClicked: colorDialogPlanet1.open();
+                    contentItem: RowLayout {
+                        Label {
+                            id: btnLabelPlanet
+                            text: "Planet1"
+                        }
+                        Rectangle {
+                            height: btnLabelPlanet.implicitHeight
+                            width: height
+                            color: lp.planetColor1
+                        }
+                    }
+                }
+                Button {
+                    Layout.minimumWidth: 80
+                    onClicked: colorDialogPlanet2.open();
+                    contentItem: RowLayout {
+                        Label {
+                            id: btnLabelP2
+                            text: "Planet2"
+                        }
+                        Rectangle {
+                            height: btnLabelP2.implicitHeight
+                            width: height
+                            color: lp.planetColor2
+                        }
+                    }
+                }
+                Item { width: 10 }
+                Button {
+                    Layout.minimumWidth: 80
+                    onClicked: colorDialogS1.open();
+                    contentItem: RowLayout {
+                        Label {
+                            id: btnLabelS1
+                            text: "S1"
+                        }
+                        Rectangle {
+                            height: btnLabelS1.implicitHeight
+                            width: height
+                            color: lp.sColor1
+                        }
+                    }
+                }
+                Button {
+                    Layout.minimumWidth: 80
+                    onClicked: colorDialogS2.open();
+                    contentItem: RowLayout {
+                        Label {
+                            id: btnLabelS2
+                            text: "S2"
+                        }
+                        Rectangle {
+                            height: btnLabelS2.implicitHeight
+                            width: height
+                            color: lp.sColor2
+                        }
+                    }
+                }
+                Item { width: 10 }
+                Button {
+                    Layout.minimumWidth: 80
+                    onClicked: colorDialogSide1.open();
+                    contentItem: RowLayout {
+                        Label {
+                            id: btnLabelSi1
+                            text: "Side1"
+                        }
+                        Rectangle {
+                            height: btnLabelSi1.implicitHeight
+                            width: height
+                            color: lp.sideColor1
+                        }
+                    }
+                }
+                Button {
+                    Layout.minimumWidth: 80
+                    onClicked: colorDialogSide2.open();
+                    contentItem: RowLayout {
+                        Label {
+                            id: btnLabelSi2
+                            text: "Side2"
+                        }
+                        Rectangle {
+                            height: btnLabelSi2.implicitHeight
+                            width: height
+                            color: lp.sideColor2
+                        }
+                    }
+                }
+
+                ColorDialog {
+                    id: colorDialogPlanet1
+                    title: "Planet 1"
+                    color: lp.planetColor1
+                    onCurrentColorChanged: lp.planetColor1 = currentColor
+                    property color c1
+                    onVisibleChanged: if(visible) c1 = color
+                    onRejected: lp.planetColor1 = c1
+                }
+                ColorDialog {
+                    id: colorDialogPlanet2
+                    title: "Planet 2"
+                    color: lp.planetColor2
+                    onCurrentColorChanged: lp.planetColor2 = currentColor
+                    property color c1
+                    onVisibleChanged: if(visible) c1 = color
+                    onRejected: lp.planetColor2 = c1
+                }
+                ColorDialog {
+                    id: colorDialogS1
+                    title: "S 1"
+                    color: lp.sColor1
+                    onCurrentColorChanged: lp.sColor1 = currentColor
+                    property color c1
+                    onVisibleChanged: if(visible) c1 = color
+                    onRejected: lp.sColor1 = c1
+                }
+                ColorDialog {
+                    id: colorDialogS2
+                    title: "S 2"
+                    color: lp.sColor2
+                    onCurrentColorChanged: lp.sColor2 = currentColor
+                    property color c1
+                    onVisibleChanged: if(visible) c1 = color
+                    onRejected: lp.sColor2 = c1
+                }
+                ColorDialog {
+                    id: colorDialogSide1
+                    title: "Side 1"
+                    color: lp.sideColor1
+                    onCurrentColorChanged: lp.sideColor1 = currentColor
+                    property color c1
+                    onVisibleChanged: if(visible) c1 = color
+                    onRejected: lp.sideColor1 = c1
+                }
+                ColorDialog {
+                    id: colorDialogSide2
+                    title: "Side 2"
+                    color: lp.sideColor2
+                    onCurrentColorChanged: lp.sideColor2 = currentColor
+                    property color c1
+                    onVisibleChanged: if(visible) c1 = color
+                    onRejected: lp.sideColor2 = c1
+                }
+            }//*/
+
             Label { text: "Radius:"}
             Slider {
                 id: slidRadius
                 Layout.fillWidth: true
-                value: 100
+                value: lp.radius
                 onValueChanged: lp.radius = value
                 from: 0
                 to: 200
@@ -136,7 +320,7 @@ ApplicationWindow {
             Slider {
                 id: slidSHeight
                 Layout.fillWidth: true
-                value: 70
+                value: lp.sHeight
                 onValueChanged: lp.sHeight = value
                 from: 0
                 to: 150
@@ -156,27 +340,27 @@ ApplicationWindow {
             Slider {
                 id: slidSideAngle
                 Layout.fillWidth: true
-                value: 0.7*180
-                onValueChanged: lp.a = value/180*Math.PI
+                value: lp.a
+                onValueChanged: lp.a = value
                 from: 0
-                to: 360
+                to: 360*Math.PI/180
             }
-            Label { text: slidSideAngle.value.toFixed(2); }
+            Label { text: (slidSideAngle.value/Math.PI*180).toFixed(2); }
             Label { text: "Angle:"}
             Slider {
                 id: slidAngle
                 Layout.fillWidth: true
-                value: -0.2*180
-                onValueChanged: lp.a2 = value/180*Math.PI
-                from: -360
+                value: lp.a2
+                onValueChanged: lp.a2 = value
+                from: -360*Math.PI/180
                 to: 0
             }
-            Label { text: slidAngle.value.toFixed(2); }
+            Label { text: (slidAngle.value/Math.PI*180).toFixed(2); }
             Label { text: "S Thickness:"}
             Slider {
                 id: slidThick
                 Layout.fillWidth: true
-                value: 80
+                value: lp.thick
                 onValueChanged: lp.thick = value
                 from: 0
                 to: 300
@@ -186,17 +370,17 @@ ApplicationWindow {
             Slider {
                 id: slidSkew
                 Layout.fillWidth: true
-                value: 180*0.065
-                onValueChanged: lp.skew = value/180*Math.PI
-                from: -90
-                to: 360
+                value: lp.skew
+                onValueChanged: lp.skew = value
+                from: -90*Math.PI/180
+                to: 360*Math.PI/180
             }
-            Label { text: slidSkew.value.toFixed(2); }
+            Label { text: (slidSkew.value/Math.PI*180).toFixed(2); }
             Label { text: "Inner Steepness:"}
             Slider {
                 id: slidInnerSteepness
                 Layout.fillWidth: true
-                value: 0.9
+                value: lp.innerSteepness
                 onValueChanged: lp.innerSteepness = value
                 from: 0
                 to: 1.5
@@ -206,7 +390,7 @@ ApplicationWindow {
             Slider {
                 id: slidInnerFactor
                 Layout.fillWidth: true
-                value: 0.7
+                value: lp.innerFactor
                 onValueChanged: lp.innerFactor = value
                 from: 0.0
                 to: 2.0
@@ -219,7 +403,7 @@ ApplicationWindow {
             Slider {
                 id: slidOutFac
                 Layout.fillWidth: true
-                value: 2.2
+                value: lp.outerLengthFactor
                 onValueChanged: lp.outerLengthFactor = value
                 from: -2
                 to: 10
@@ -229,7 +413,7 @@ ApplicationWindow {
             Slider {
                 id: slidInFac
                 Layout.fillWidth: true
-                value: 0.9
+                value: lp.innerLengthFactor
                 onValueChanged: lp.innerLengthFactor = value
                 from: -2
                 to: 10
@@ -239,7 +423,7 @@ ApplicationWindow {
             Slider {
                 id: slidSideSpring
                 Layout.fillWidth: true
-                value: 50
+                value: lp.sideSpring
                 onValueChanged: lp.sideSpring = value
                 from: 0
                 to: 200
@@ -249,7 +433,7 @@ ApplicationWindow {
             Slider {
                 id: slidSideSpringAdapt
                 Layout.fillWidth: true
-                value: -0.1
+                value: lp.stiffOrSpringyAdapt
                 onValueChanged: lp.stiffOrSpringyAdapt = value
                 from: -1
                 to: +1
@@ -259,7 +443,7 @@ ApplicationWindow {
             Slider {
                 id: slidAboveSphereAngle
                 Layout.fillWidth: true
-                value: 0.6
+                value: lp.aboveSphereAngle
                 onValueChanged: lp.aboveSphereAngle = value
                 from: 0.1
                 to: Math.PI*2
@@ -269,7 +453,7 @@ ApplicationWindow {
             Slider {
                 id: slidAboveSphereCtr
                 Layout.fillWidth: true
-                value: 0.7
+                value: lp.aboveSphereStrenghtCenter
                 onValueChanged: lp.aboveSphereStrenghtCenter = value
                 from: 0
                 to: 4
@@ -279,7 +463,7 @@ ApplicationWindow {
             Slider {
                 id: slidAboveSphereOut
                 Layout.fillWidth: true
-                value: 1.0
+                value: lp.aboveSphereStrenghtOuter
                 onValueChanged: lp.aboveSphereStrenghtOuter = value
                 from: -1
                 to: 1
@@ -288,19 +472,31 @@ ApplicationWindow {
         }
     }
 
+    function loadJsonFile(fileUrl) {
+        console.log("Loading file: " + fileUrl)
+        var request = new XMLHttpRequest();
+        request.open("GET", fileUrl, false);
+        request.send(null);
+        var jsonString = request.responseText;
+        //console.log("Content: " + jsonString)
+        var jsonObject = JSON.parse(jsonString);
+        for (var prop in lp) {
+            if(typeof emptyDummy[prop] === "undefined" && typeof lp[prop] !== "function") {
+                if(typeof jsonObject[prop] === "object") {
+                    lp[prop] = Qt.rgba(jsonObject[prop].r, jsonObject[prop].g, jsonObject[prop].b, jsonObject[prop].a);
+                } else {
+                    // maybe an older version of the json has not all properties defined.
+                    if(typeof jsonObject[prop] !== "undefined") {
+                        lp[prop] = jsonObject[prop];
+                    }
+                }
+            }
+        }
+    }
+
     Component.onCompleted: {
         if(typeof loadedFile !== "undefined") {
-            console.log("Loading file: " + loadedFile)
-            var request = new XMLHttpRequest();
-            request.open("GET", "file:///"+loadedFile, false);
-            request.send(null);
-            var jsonString = request.responseText;
-            console.log("Content: " + jsonString)
-            var jsonObject = JSON.parse(jsonString);
-            for (var prop in lp) {
-                if(typeof emptyDummy[prop] === "undefined")
-                    lp[prop] = jsonObject[prop];
-            }
+            loadJsonFile("file:///"+loadedFile);
         }
     }
 
@@ -317,8 +513,8 @@ ApplicationWindow {
                 var dateString = "";
 
                 dateString += now.getFullYear() + "-";
-                dateString += now.getMonth() + "-";
-                dateString += now.getDay() + "-";
+                dateString += (now.getMonth()+1) + "-";
+                dateString += now.getDate() + "_";
                 dateString += now.getHours() + "-";
                 dateString += now.getMinutes() + "-";
                 dateString += now.getSeconds();
@@ -331,12 +527,8 @@ ApplicationWindow {
                 var jsonText = JSON.stringify(jsonObject)
                 var request = new XMLHttpRequest();
                 var path = currentPath;
-                console.log("DBG: Qt.resolvedUrl" + Qt.resolvedUrl("./../"))
-                console.log("DBG: path" + currentPath)
-                console.log("DBG: " + jsonText)
                 request.open("PUT", currentPath+"snapora-logo-"+dateString+".json", false);
                 request.send(jsonText);
-                console.log("stored DBG: " + request.status)
                 return request.status;
             });
         }
@@ -347,12 +539,13 @@ ApplicationWindow {
         anchors.left: controls.right
         Label { text: "Scale:" }
         Slider {
-            id: scaleSlider
             Layout.fillWidth: true
-            value: 1
+            value: lp.sscale
+            onValueChanged: lp.sscale = value
             from: 0.5
             to: 4.0
         }
+        Label { text: lp.sscale.toFixed(2); Layout.minimumWidth: 50}
     }
 
     Rectangle {
@@ -375,7 +568,7 @@ ApplicationWindow {
             clip: true
             Item {
                 anchors.centerIn: parent
-                scale: scaleSlider.value
+                scale: lp.sscale
                 Rectangle {
                     z:6
                     //opacity: 0.5
@@ -385,8 +578,8 @@ ApplicationWindow {
                     anchors.centerIn: parent
                     color: "blue"
                     gradient: LinearGradient {
-                        GradientStop { color: "#43e97b"; position: 0}
-                        GradientStop { color: "#38f9d7"; position: 1}
+                        GradientStop { color: lp.planetColor1; position: 0}
+                        GradientStop { color: lp.planetColor2; position: 1}
                     }
                 }
         //        GraphicFX.DropShadow {
@@ -426,8 +619,8 @@ ApplicationWindow {
                         fillGradient: LinearGradient {
                             spread: ShapeGradient.ReflectSpread
                             y1: -lp.radius; y2: lp.radius*2.0+lp.sHeight
-                            GradientStop { color: Qt.darker("#4facfe"); position: 0.2}
-                            GradientStop { color: Qt.darker("#00f2fe"); position: 0.1}
+                            GradientStop { color: lp.sideColor1; position: 0.2}
+                            GradientStop { color: lp.sideColor2; position: 0.1}
                         }
                         strokeWidth: 0
                         strokeColor: "transparent"
@@ -489,8 +682,8 @@ ApplicationWindow {
                             fillGradient: LinearGradient {
                                 spread: ShapeGradient.ReflectSpread
                                 y1: -lp.radius; y2: lp.radius*2.0+lp.sHeight
-                                GradientStop { color: "#4facfe"; position: 0.5}
-                                GradientStop { color: "#00f2fe"; position: 0.1}
+                                GradientStop { color: lp.sColor1; position: 0.5}
+                                GradientStop { color: lp.sColor2; position: 0.1}
                             }
 
                             strokeWidth: 0

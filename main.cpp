@@ -4,6 +4,8 @@
 #include <QSurfaceFormat>
 #include <QQmlContext>
 #include <QDebug>
+//#include <QtQuickShapes/QtQuickShapes>
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
